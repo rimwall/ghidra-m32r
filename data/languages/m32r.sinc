@@ -67,10 +67,10 @@ define token data16 (16)
 	imm16	= (0,15)
 	rel16	= (0,15) signed
 	simm16	= (0,15) signed
-	Rdest_B = (0,3)
-	op1_B   = (4,7)
-	Rsrc_B  = (8,11)
-	op3_B   = (12,15)
+	Rdest_B = (8,11)
+	op1_B   = (12,15)
+	Rsrc_B  = (0,3)
+	op3_B   = (4,7)
 ;
 
 attach variables [ Rdest_B Rsrc_B ] [ R0 R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 FP R14 SP];
@@ -158,8 +158,10 @@ FP_ADDRESS:	rel					is	rel16	[ rel = rel16 + 0x808000; ] { export &:4 rel; }
 }
 
 
-:TST31 Rdest_B is op1_B=0 & Rdest_B & op3_B=9 & Rdest_B=Rsrc_B {
-	$(C) = (Rdest_B[31,1] == 1);
+:TSTb31 Rdest_B is op1_B=0 & Rdest_B & Rdest_B=Rsrc_B & op3_B=9 {
+	local tmp = Rdest_B & (1 << 31);
+	$(C) = (tmp != 0);
+	CBR = zext(tmp != 0);
 }
 
 :AND	Rdest, Rsrc				is op1=0 & Rdest; op3=12 & Rsrc {
